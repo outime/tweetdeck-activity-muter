@@ -1,0 +1,34 @@
+{
+  "manifest_version": 2,
+
+  "name": "TweetDeck Activity Muter",
+  "description": "This extension will block certain annoying users from appearing in the Activity column in TweetDeck.",
+  "version": "1.0",
+
+  "author": "outime",
+
+  "page_action": {
+    "default_icon": "icon.png",
+    "default_title": "TweetDeck Activity Muter",
+    "default_popup": "popup.html"
+  },
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+
+  "content_scripts": [
+    {
+       "matches": ["https://tweetdeck.twitter.com/*"],
+       "js": ["jquery.min.js"],
+       "run_at": "document_start"
+    }
+  ],
+
+  "permissions": [
+    "activeTab",
+    "storage",
+    "https://tweetdeck.twitter.com/*"
+  ]
+}
