@@ -2,8 +2,9 @@
   "manifest_version": 2,
 
   "name": "TweetDeck Activity Muter",
+  "short_name": "TDAM",
   "description": "This extension will block certain annoying users from appearing in the Activity column in TweetDeck.",
-  "version": "1.0",
+  "version": "1.1",
 
   "author": "outime",
 
@@ -27,7 +28,7 @@
   ],
 
   "permissions": [
-    "activeTab",
+    "tabs",
     "storage",
     "https://tweetdeck.twitter.com/*"
   ]
