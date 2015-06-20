@@ -2,7 +2,7 @@ $(function() {
   var userRegexp = /^[\w]{1,15}$/
   var deleteLink = '(<a href="#">delete</a>)';
 
-  function populateUserlist(){
+  function populateUserlist(showWarning){
     chrome.storage.sync.get('mutedUserlist', function(result) {
       var mutedUserlist = result.mutedUserlist;
       if (typeof mutedUserlist === 'undefined') return;
@@ -12,22 +12,22 @@ $(function() {
           $('<li id="' + username + '">').html(username + ' ' + deleteLink)
         );
       });
+      if (showWarning === true) $('#refresh-warning').html("You need to refresh the page to apply the changes.");
     });
   }
 
-  populateUserlist();
+  populateUserlist(false);
 
   $("#username-input").focus();
 
   $(document).on('click', 'a', function(){
-    var parent = this.parentElement;
-    var username = parent.id;
+    var username = this.parentElement.id;
     chrome.storage.sync.get('mutedUserlist', function(result) {
       var mutedUserlist = result.mutedUserlist;
       var userIndex = mutedUserlist.indexOf(username);
       mutedUserlist.splice(userIndex, 1);
       chrome.storage.sync.set({mutedUserlist: mutedUserlist});
-      $(parent).remove();
+      populateUserlist(true);
     });
   });
 
@@ -41,7 +41,7 @@ $(function() {
       mutedUserlist.push(username);
       chrome.storage.sync.set({mutedUserlist: mutedUserlist});
       $('#username-input').val('');
-      populateUserlist();
+      populateUserlist(true);
       $('#refresh-warning').html("You need to refresh the page to apply the changes.");
     });
   });
