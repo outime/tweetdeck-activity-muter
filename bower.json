@@ -1,0 +1,19 @@
+{
+  "name": "tweetdeck-activity-muter",
+  "version": "1.0.0",
+  "homepage": "https://github.com/outime/tweetdeck-activity-muter",
+  "authors": [
+    "Ruben Diaz <outime@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "~2.1.4"
+  }
+}

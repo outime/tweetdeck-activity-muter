@@ -1,0 +1,23 @@
+{
+  "name": "tweetdeck-activity-muter",
+  "version": "1.0.0",
+  "dependencies": {},
+  "devDependencies": {
+    "bower": "^1.5.2",
+    "gulp": "^3.9.0",
+    "gulp-clean": "^0.3.1",
+    "gulp-cleanhtml": "^0.1.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-minify-css": "^1.2.1",
+    "gulp-strip-debug": "^1.0.2",
+    "gulp-uglify": "^1.4.0",
+    "gulp-zip": "^3.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/outime/tweetdeck-activity-muter.git"
+  },
+  "author": "Ruben Diaz",
+  "license": "MIT",
+  "homepage": "https://github.com/outime/tweetdeck-activity-muter"
+}
