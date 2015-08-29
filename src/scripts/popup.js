@@ -1,6 +1,9 @@
 $(function() {
-  var userRegexp = /^[\w]{1,15}$/
-  var deleteLink = '(<a href="#">delete</a>)';
+
+  var userRegexp = /^[\w]{1,15}$/, 
+      deleteLink = '(<a href="#" class="delete">delete</a>)';
+
+  $('body').fadeIn('slow');
 
   function populateUserlist(showWarning){
     chrome.storage.sync.get('mutedUserlist', function(result) {
@@ -12,7 +15,7 @@ $(function() {
           $('<li id="' + username + '">').html(username + ' ' + deleteLink)
         );
       });
-      if (showWarning === true) $('#refresh-warning').html("You need to refresh the page to apply the changes.");
+      if (showWarning === true) $('#refresh-warning').html('You need to refresh the page to apply the changes.');
     });
   }
 
@@ -42,7 +45,7 @@ $(function() {
       chrome.storage.sync.set({mutedUserlist: mutedUserlist});
       $('#username-input').val('');
       populateUserlist(true);
-      $('#refresh-warning').html("You need to refresh the page to apply the changes.");
+      $('#refresh-warning').html('You need to refresh the page to apply the changes.');
     });
   });
 });

@@ -32,8 +32,6 @@ $(function() {
       });
     });
 
-    var config = { childList: true }
- 
-    observer.observe(target, config);
+    observer.observe(target, {childList: true});
   }
 });

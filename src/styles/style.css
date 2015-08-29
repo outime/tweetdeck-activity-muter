@@ -1,0 +1,31 @@
+body {
+    display: none;
+}
+
+h1 {
+    text-align: center;
+    font-size: 18px;
+    color: #2b7bb9;
+}
+
+ul {
+    padding-left: 20px;
+    list-style-type: none;
+}
+
+li:before {
+    content: "\00bb  ";
+}
+
+a.delete {
+    text-decoration: none;
+    color: #bb0000;
+}
+
+a.delete:hover{
+    color: #ff3333;
+}
+
+#add-form {
+    margin-bottom: 15px;
+}

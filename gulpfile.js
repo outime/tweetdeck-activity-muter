@@ -52,9 +52,9 @@ gulp.task('scripts', ['jshint'], function() {
 
 //minify styles
 gulp.task('styles', function() {
-// 	return gulp.src('src/styles/**/*.css')
-// 		.pipe(minifycss({root: 'src/styles', keepSpecialComments: 0}))
-// 		.pipe(gulp.dest('build/styles'));
+ 	return gulp.src('src/styles/**/*.css')
+ 		.pipe(minifycss({root: 'src/styles', keepSpecialComments: 0}))
+ 		.pipe(gulp.dest('build/styles'));
 //	return gulp.src('src/styles/**')
 //		.pipe(gulp.dest('build/styles'));
 });
