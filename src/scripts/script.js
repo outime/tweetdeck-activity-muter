@@ -7,7 +7,6 @@ $(function() {
     attachInterval = window.setInterval(function(){
       if ($('.column-type-activity .chirp-container article').length) {
         attachActivityMuter();
-        cleanActivityColumn();
         clearInterval(attachInterval);
       }
     }, 500);
@@ -31,7 +30,7 @@ $(function() {
         cleanActivityColumn();
       });
     });
-
+    cleanActivityColumn();
     observer.observe(target, {childList: true});
   }
 });

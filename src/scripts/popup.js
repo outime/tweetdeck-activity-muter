@@ -45,7 +45,6 @@ $(function() {
       chrome.storage.sync.set({mutedUserlist: mutedUserlist});
       $('#username-input').val('');
       populateUserlist(true);
-      $('#refresh-warning').html('You need to refresh the page to apply the changes.');
     });
   });
 });
