@@ -29,3 +29,7 @@ a.delete:hover{
 #add-form {
     margin-bottom: 15px;
 }
+
+#warning-text {
+    color: #ff3333;
+}

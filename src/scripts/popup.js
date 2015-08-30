@@ -5,7 +5,7 @@ $(function() {
 
   $('body').fadeIn('slow');
 
-  function populateUserlist(showWarning){
+  function populateUserlist(){
     chrome.storage.sync.get('mutedUserlist', function(result) {
       var mutedUserlist = result.mutedUserlist;
       if (typeof mutedUserlist === 'undefined') return;
@@ -15,13 +15,12 @@ $(function() {
           $('<li id="' + username + '">').html(username + ' ' + deleteLink)
         );
       });
-      if (showWarning === true) $('#refresh-warning').html('You need to refresh the page to apply the changes.');
     });
   }
 
-  populateUserlist(false);
+  populateUserlist();
 
-  $("#username-input").focus();
+  $('#username-input').focus();
 
   $(document).on('click', 'a', function(){
     var username = this.parentElement.id;
@@ -30,7 +29,8 @@ $(function() {
       var userIndex = mutedUserlist.indexOf(username);
       mutedUserlist.splice(userIndex, 1);
       chrome.storage.sync.set({mutedUserlist: mutedUserlist});
-      populateUserlist(true);
+      populateUserlist();
+      $('#warning-text').text('Past activities from ' + username + ' won\'t be seen until you refresh!');
     });
   });
 
@@ -44,7 +44,7 @@ $(function() {
       mutedUserlist.push(username);
       chrome.storage.sync.set({mutedUserlist: mutedUserlist});
       $('#username-input').val('');
-      populateUserlist(true);
+      populateUserlist();
     });
   });
 });

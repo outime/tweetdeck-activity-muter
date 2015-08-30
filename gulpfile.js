@@ -55,8 +55,6 @@ gulp.task('styles', function() {
  	return gulp.src('src/styles/**/*.css')
  		.pipe(minifycss({root: 'src/styles', keepSpecialComments: 0}))
  		.pipe(gulp.dest('build/styles'));
-//	return gulp.src('src/styles/**')
-//		.pipe(gulp.dest('build/styles'));
 });
 
 //build ditributable and sourcemaps after other tasks completed
