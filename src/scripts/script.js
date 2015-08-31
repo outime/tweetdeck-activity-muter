@@ -3,30 +3,30 @@ $(function() {
 
   attachInterval = window.setInterval(function(){
     if ($('.column-type-activity .chirp-container article').length) {
-      refreshMutedUserlist();
-      cleanActivityColumn();
+      refreshMutedUserlist(null, cleanActivityColumn);
       attachActivityMuter();
       clearInterval(attachInterval);
     }
   }, 500);
 
   chrome.storage.onChanged.addListener(function(changes, namespace) {
-    refreshMutedUserlist(changes.mutedUserlist.newValue);
-    cleanActivityColumn();
+    refreshMutedUserlist(changes.mutedUserlist.newValue, cleanActivityColumn);
   });
 
-  function refreshMutedUserlist(newMutedUserlist){
-    if (typeof newMutedUserlist !== 'undefined') {
+  function refreshMutedUserlist(newMutedUserlist, cb){
+    if (newMutedUserlist != null) {
       mutedUserlist = newMutedUserlist;
+      if (typeof cb === "function") cb();
     } else {
       chrome.storage.sync.get('mutedUserlist', function(result) {
         mutedUserlist = result.mutedUserlist;
+        if (typeof cb === "function") cb();
       });
     }
   }
 
   function cleanActivityColumn(){
-    if (typeof mutedUserlist === 'undefined') return;
+    if (mutedUserlist == null) return;
     $('.column-type-activity .chirp-container article').each(function(article) {
       var authorDiv = $(this).find('.account-link')[0];
       var author = $(authorDiv).attr('href').split('/')[3].toLowerCase();

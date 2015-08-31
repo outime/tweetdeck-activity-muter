@@ -4,7 +4,7 @@
   "name": "TweetDeck Activity Muter",
   "short_name": "TAM",
   "description": "This extension will block certain annoying users from appearing in the Activity column in TweetDeck.",
-  "version": "1.3.0",
+  "version": "1.4.0",
 
   "author": "outime",
 
