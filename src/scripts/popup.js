@@ -1,18 +1,17 @@
-$(function() {
-
-  var userRegexp = /^[\w]{1,15}$/, 
-      deleteLink = '(<a href="#" class="delete">delete</a>)';
+$(() => {
+  const deletedUsernames = [];
+  const userRegexp = /^[\w]{1,15}$/;
 
   $('body').fadeIn('slow');
 
-  function populateUserlist(){
-    chrome.storage.sync.get('mutedUserlist', function(result) {
-      var mutedUserlist = result.mutedUserlist;
+  function populateUserlist() {
+    chrome.storage.sync.get('mutedUserlist', (result) => {
+      const { mutedUserlist } = result;
       if (typeof mutedUserlist === 'undefined') return;
       $('#muted-userlist').empty();
-      mutedUserlist.forEach(function(username) {
+      mutedUserlist.forEach((username) => {
         $('#muted-userlist').append(
-          $('<li id="' + username + '">').html(username + ' ' + deleteLink)
+          $(`<li>`).html(`${username} (<a href="#" id="${username}" class="delete">delete</a>)`),
         );
       });
     });
@@ -22,29 +21,35 @@ $(function() {
 
   $('#username-input').focus();
 
-  $(document).on('click', 'a', function(){
-    var username = this.parentElement.id;
-    chrome.storage.sync.get('mutedUserlist', function(result) {
-      var mutedUserlist = result.mutedUserlist;
-      var userIndex = mutedUserlist.indexOf(username);
-      mutedUserlist.splice(userIndex, 1);
-      chrome.storage.sync.set({mutedUserlist: mutedUserlist});
-      populateUserlist();
-      $('#warning-text').text('Past activities from ' + username + ' won\'t be seen until you refresh!');
-    });
+  document.body.addEventListener('click', (e) => {
+    if (e.target && e.target.nodeName === 'A') {
+      const username = e.target.id;
+      chrome.storage.sync.get('mutedUserlist', (result) => {
+        const { mutedUserlist } = result;
+        const userIndex = mutedUserlist.indexOf(username);
+        mutedUserlist.splice(userIndex, 1);
+        chrome.storage.sync.set({ mutedUserlist });
+        populateUserlist();
+        deletedUsernames.push(username);
+        document.getElementById('warning-text').innerHTML = `Past activities from ${deletedUsernames.join(', ')} won't be seen <strong>until you refresh</strong>!`;
+      });
+    }
   });
 
-  $('#add-form').on('submit', function(e){
-    e.preventDefault();
-    var username = $(this).serializeArray()[0].value.toLowerCase();
-    chrome.storage.sync.get('mutedUserlist', function(result) {
-      var mutedUserlist = result.mutedUserlist;
-      if (typeof mutedUserlist === 'undefined') mutedUserlist = [];
-      if ((mutedUserlist.indexOf(username) > -1) || (userRegexp.test(username) === false)) return;
-      mutedUserlist.push(username);
-      chrome.storage.sync.set({mutedUserlist: mutedUserlist});
-      $('#username-input').val('');
-      populateUserlist();
-    });
+  document.querySelector('#username-input').addEventListener('keypress', (e) => {
+    const code = e.keyCode || e.which;
+    if (code === 13) {
+      e.preventDefault();
+      const username = document.getElementById('username-input').value.toLowerCase();
+      chrome.storage.sync.get('mutedUserlist', (result) => {
+        let { mutedUserlist } = result;
+        if (typeof mutedUserlist === 'undefined') mutedUserlist = [];
+        if ((mutedUserlist.indexOf(username) > -1) || (userRegexp.test(username) === false)) return;
+        mutedUserlist.push(username);
+        chrome.storage.sync.set({ mutedUserlist });
+        $('#username-input').val('');
+        populateUserlist();
+      });
+    }
   });
 });
