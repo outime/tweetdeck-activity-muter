@@ -13,9 +13,6 @@
     "gulp-minify-css": "^1.2.1",
     "gulp-zip": "^3.0.2"
   },
-  "scripts": {
-    "postinstall": "bower install"
-  },
   "repository": {
     "type": "git",
     "url": "https://github.com/outime/tweetdeck-activity-muter.git"

@@ -1,4 +1,4 @@
-$(() => {
+document.addEventListener('DOMContentLoaded', () => {
   let mutedUserlist = null;
   let attachInterval = null;
 

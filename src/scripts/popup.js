@@ -1,25 +1,24 @@
-$(() => {
+document.addEventListener('DOMContentLoaded', () => {
   const deletedUsernames = [];
   const userRegexp = /^[\w]{1,15}$/;
 
-  $('body').fadeIn('slow');
+  document.body.style.display = 'block';
 
   function populateUserlist() {
+    const getUserlistEl = () => document.getElementById('muted-userlist');
     chrome.storage.sync.get('mutedUserlist', (result) => {
       const { mutedUserlist } = result;
       if (typeof mutedUserlist === 'undefined') return;
-      $('#muted-userlist').empty();
+      while (getUserlistEl().lastChild) getUserlistEl().removeChild(getUserlistEl().lastChild);
       mutedUserlist.forEach((username) => {
-        $('#muted-userlist').append(
-          $(`<li>`).html(`${username} (<a href="#" id="${username}" class="delete">delete</a>)`),
-        );
+        getUserlistEl().innerHTML += `<li>${username} (<a href="#" id="${username}" class="delete">delete</a>)</li>`;
       });
     });
   }
 
   populateUserlist();
 
-  $('#username-input').focus();
+  document.getElementById('username-input').focus();
 
   document.body.addEventListener('click', (e) => {
     if (e.target && e.target.nodeName === 'A') {
@@ -47,7 +46,7 @@ $(() => {
         if ((mutedUserlist.indexOf(username) > -1) || (userRegexp.test(username) === false)) return;
         mutedUserlist.push(username);
         chrome.storage.sync.set({ mutedUserlist });
-        $('#username-input').val('');
+        document.getElementById('username-input').value = '';
         populateUserlist();
       });
     }

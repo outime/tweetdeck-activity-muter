@@ -1,8 +1,7 @@
 {
   "extends": ["airbnb-base"],
   "globals": {
-    "chrome": true,
-    "$": true
+    "chrome": true
   },
   "env": {
     "browser": true

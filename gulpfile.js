@@ -35,9 +35,6 @@ gulp.task('eslint', () => gulp.src('src/scripts/*.js')
 
 // copy vendor scripts and uglify all other scripts, creating source maps
 gulp.task('scripts', gulp.series('eslint', (cb) => {
-  // gulp.src('bower_components/**/dist/*.min.js')
-  gulp.src('bower_components/*/dist/*.min.js')
-    .pipe(gulp.dest('build/scripts/vendors'));
   gulp.src(['src/scripts/**/*.js'])
     //.pipe(stripdebug())
     //.pipe(uglify({ outSourceMap: true }))
