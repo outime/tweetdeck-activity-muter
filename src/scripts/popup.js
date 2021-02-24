@@ -1,36 +1,58 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const deletedUsernames = [];
-  const userRegexp = /^[\w]{1,15}$/;
+  const userRegex = /^[\w]{1,15}$/;
 
-  document.body.style.display = 'block';
+  const getUserlistEl = () => document.getElementById('muted-userlist');
 
-  function populateUserlist() {
-    const getUserlistEl = () => document.getElementById('muted-userlist');
-    chrome.storage.sync.get('mutedUserlist', (result) => {
-      const { mutedUserlist } = result;
-      if (typeof mutedUserlist === 'undefined') return;
-      while (getUserlistEl().lastChild) getUserlistEl().removeChild(getUserlistEl().lastChild);
-      mutedUserlist.forEach((username) => {
-        getUserlistEl().innerHTML += `<li>${username} (<a href="#" id="${username}" class="delete">delete</a>)</li>`;
-      });
+  const getPopulatedUserEl = (username) => `<li>${username} (<a href="#" id="${username}" class="delete">delete</a>)</li>`;
+
+  const getMutedUserList = (cb) => chrome.storage.sync.get('mutedUserlist', cb);
+
+  const updateMutedUserList = (userList) => chrome.storage.sync.set(userList);
+
+  const getCleanedUserlistEl = (userlistEl) => {
+    const cleanedUserlistEl = userlistEl.cloneNode(true);
+    const elLastChild = cleanedUserlistEl.lastChild;
+    if (cleanedUserlistEl.lastChild) {
+      cleanedUserlistEl.removeChild(elLastChild);
+      return getCleanedUserlistEl(cleanedUserlistEl);
+    }
+    return cleanedUserlistEl;
+  };
+
+  const getPopulatedUserlistEl = (userlistEl, cb) => getMutedUserList((result) => {
+    const { mutedUserlist } = result;
+    if (typeof mutedUserlist === 'undefined') return cb(userlistEl);
+    const populatedUserlist = userlistEl.cloneNode(true);
+    mutedUserlist.forEach((username) => {
+      populatedUserlist.innerHTML += getPopulatedUserEl(username);
     });
-  }
+    return cb(populatedUserlist);
+  });
 
-  populateUserlist();
+  const cleanAndPopulateUserlist = (userlistEl) => {
+    const cleanedUserlistEl = getCleanedUserlistEl(userlistEl);
+    userlistEl.replaceWith(cleanedUserlistEl);
+    getPopulatedUserlistEl(cleanedUserlistEl, (populatedUserlistEl) => {
+      cleanedUserlistEl.replaceWith(populatedUserlistEl);
+    });
+  };
 
-  document.getElementById('username-input').focus();
+  const getWarningTextEl = () => document.getElementById('warning-text');
+
+  const enableRefreshWarning = (deletedUsername) => {
+    getWarningTextEl().innerHTML = `Past activity from <em>${deletedUsername}</em> and other deleted users won't be seen <strong>until you refresh</strong>!`;
+  };
 
   document.body.addEventListener('click', (e) => {
     if (e.target && e.target.nodeName === 'A') {
       const username = e.target.id;
-      chrome.storage.sync.get('mutedUserlist', (result) => {
+      getMutedUserList((result) => {
         const { mutedUserlist } = result;
         const userIndex = mutedUserlist.indexOf(username);
         mutedUserlist.splice(userIndex, 1);
-        chrome.storage.sync.set({ mutedUserlist });
-        populateUserlist();
-        deletedUsernames.push(username);
-        document.getElementById('warning-text').innerHTML = `Past activities from ${deletedUsernames.join(', ')} won't be seen <strong>until you refresh</strong>!`;
+        updateMutedUserList({ mutedUserlist });
+        cleanAndPopulateUserlist(getUserlistEl());
+        enableRefreshWarning(username);
       });
     }
   });
@@ -40,15 +62,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (code === 13) {
       e.preventDefault();
       const username = document.getElementById('username-input').value.toLowerCase();
-      chrome.storage.sync.get('mutedUserlist', (result) => {
+      getMutedUserList((result) => {
         let { mutedUserlist } = result;
         if (typeof mutedUserlist === 'undefined') mutedUserlist = [];
-        if ((mutedUserlist.indexOf(username) > -1) || (userRegexp.test(username) === false)) return;
+        if ((mutedUserlist.indexOf(username) > -1) || (userRegex.test(username) === false)) return;
         mutedUserlist.push(username);
-        chrome.storage.sync.set({ mutedUserlist });
+        updateMutedUserList({ mutedUserlist });
         document.getElementById('username-input').value = '';
-        populateUserlist();
+        cleanAndPopulateUserlist(getUserlistEl());
       });
     }
   });
+
+  document.body.style.display = 'block';
+  cleanAndPopulateUserlist(getUserlistEl());
+  document.getElementById('username-input').focus();
 });
