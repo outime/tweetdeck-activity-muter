@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const getUserlistEl = () => document.getElementById('muted-userlist');
 
-  const getPopulatedUserEl = (username) => `<li>${username} (<a href="#" id="${username}" class="delete">delete</a>)</li>`;
+  const getPopulatedUserEl = (username) => `<li>${username} (<a href="#" id="${username}" class="delete">unmute</a>)</li>`;
 
   const getMutedUserList = (cb) => chrome.storage.sync.get('mutedUserlist', cb);
 
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const getWarningTextEl = () => document.getElementById('warning-text');
 
   const enableRefreshWarning = (deletedUsername) => {
-    getWarningTextEl().innerHTML = `Past activity from <em>${deletedUsername}</em> and other deleted users won't be seen <strong>until you refresh</strong>!`;
+    getWarningTextEl().innerHTML = `Past activity from <em>${deletedUsername}</em> and other unmuted users won't be seen <strong>until you refresh</strong>!`;
   };
 
   document.body.addEventListener('click', (e) => {
