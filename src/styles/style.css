@@ -1,16 +1,28 @@
 body {
     display: none;
+    margin: 2.4em;
 }
 
 h1 {
     text-align: center;
-    font-size: 18px;
+    font-size: 1.5em;
     color: #1da1f2;
+    text-shadow: 0 0 9px rgb(0 0 0 / 30%);
+}
+
+input[type="text"]
+{
+    width: 11em;
+    height: 1.8em;
 }
 
 ul {
-    padding-left: 20px;
+    padding-left: 0;
     list-style-type: none;
+}
+
+li {
+    font-size: 1.1em;
 }
 
 li:before {
