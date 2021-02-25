@@ -2,70 +2,62 @@ document.addEventListener('DOMContentLoaded', () => {
   let mutedUserlist = null;
   let attachInterval = null;
 
-  function getAppContainer() {
-    return document.getElementById('container');
-  }
+  const getMutedUserList = (cb) => chrome.storage.sync.get('mutedUserlist', cb);
 
-  function getAppColumns(appContainer) {
+  const getAppContainer = () => document.getElementById('container');
+
+  const getAppColumns = (appContainer) => {
     if (appContainer === null) return false; // app not ready
 
     const appColumns = appContainer.getElementsByClassName('js-app-columns app-columns')[0].children;
     return Array.from(appColumns);
-  }
+  };
 
-  function getActivityColumn(appColumns) {
-    const isActivityColumn = (col) => {
-      const columnHeading = col.getElementsByClassName('column-heading')[0].innerText;
-      return columnHeading === 'Activity';
-    };
+  const getActivityColumn = (appColumns) => {
+    const getColumnHeading = (appColumn) => appColumn.getElementsByClassName('column-heading')[0].innerText;
+    const isActivityColumn = (appColumn) => getColumnHeading(appColumn) === 'Activity';
 
     if (appColumns === false) return false;
 
-    const filteredActivityColumns = appColumns.filter((col) => isActivityColumn(col));
+    const filteredActivityColumns = appColumns.filter(isActivityColumn);
     return filteredActivityColumns[0]; // there should only be one
-  }
+  };
 
-  function getColumnEntries(appColumn) {
+  const getColumnEntries = (appColumn) => {
     if (appColumn === false) return false;
+
     const entriesContainer = appColumn.getElementsByClassName('js-chirp-container chirp-container')[0];
     const entries = entriesContainer.children;
     return Array.from(entries);
-  }
+  };
 
-  const isColumnEntryLoaded = (entry) => entry.getAttribute('data-testid') !== 'columnLoadingPlaceholder';
-
-  function areColumnEntriesLoaded(columnEntries) {
+  const areColumnEntriesLoaded = (columnEntries) => {
+    const isColumnEntryLoaded = (entry) => entry.getAttribute('data-testid') !== 'columnLoadingPlaceholder';
     const loadedStatuses = columnEntries.map(isColumnEntryLoaded);
     const allLoadedChecker = (arr) => arr.every((v) => v === true);
     return allLoadedChecker(loadedStatuses);
-  }
+  };
 
-  function refreshMutedUserlist(newMutedUserlist, cb, cbArg) {
-    if (newMutedUserlist !== null) {
-      mutedUserlist = newMutedUserlist;
-      if (typeof cb === 'function') cb(cbArg);
-    } else {
-      chrome.storage.sync.get('mutedUserlist', (result) => {
-        mutedUserlist = result.mutedUserlist;
-        if (typeof cb === 'function') cb(cbArg);
-      });
-    }
-  }
+  const refreshMutedUserlist = (newMutedUserlist, cb, cbArg) => {
+    mutedUserlist = newMutedUserlist;
+    if (typeof cb === 'function') cb(cbArg);
+  };
 
-  function filterActivityColumn(activityColumn) {
+  const filterActivityColumn = (activityColumn) => {
+    const getHandleUri = (activityEntry) => activityEntry.getElementsByClassName('account-link')[0].getAttribute('href');
+    const getHandleFromHandleUri = (handleUri) => handleUri.split('/').pop().toLowerCase();
     if (!Array.isArray(mutedUserlist)) return;
+
     const activityEntries = getColumnEntries(activityColumn);
     activityEntries.forEach((entry) => {
       if (entry.getAttribute('data-testid') === 'columnLoadingPlaceholder') return;
-      const handleUri = entry.getElementsByClassName('account-link')[0].getAttribute('href');
-      const handle = handleUri.split('/').pop().toLowerCase();
-      if (mutedUserlist.includes(handle)) {
-        entry.remove();
-      }
+      const handleUri = getHandleUri(entry);
+      const handle = getHandleFromHandleUri(handleUri);
+      if (mutedUserlist.includes(handle)) entry.remove();
     });
-  }
+  };
 
-  function attachActivityMuter() {
+  const attachActivityMuter = () => {
     const appContainer = getAppContainer();
     const appColumns = getAppColumns(appContainer);
     const target = getActivityColumn(appColumns);
@@ -73,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
       mutations.forEach(() => filterActivityColumn());
     }));
     activityObserver.observe(target, { childList: true });
-  }
+  };
 
   attachInterval = window.setInterval(() => {
     const appContainer = getAppContainer();
@@ -81,9 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const activityColumn = getActivityColumn(appColumns);
     const activityEntries = getColumnEntries(activityColumn);
     if (activityEntries !== false && areColumnEntriesLoaded(activityEntries)) {
-      refreshMutedUserlist(null, filterActivityColumn, activityColumn);
-      attachActivityMuter();
-      clearInterval(attachInterval);
+      getMutedUserList((result) => {
+        refreshMutedUserlist(result.mutedUserlist, filterActivityColumn, activityColumn);
+        attachActivityMuter();
+        clearInterval(attachInterval);
+      });
     }
   }, 500);
 
