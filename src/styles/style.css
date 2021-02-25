@@ -1,19 +1,26 @@
 body {
     display: none;
     margin: 2.4em;
+    background-color: #1c2938;
 }
 
 h1 {
     text-align: center;
     font-size: 1.5em;
     color: #1da1f2;
-    text-shadow: 0 0 9px rgb(0 0 0 / 30%);
 }
 
 input[type="text"]
 {
     width: 11em;
     height: 1.8em;
+    background-color: #10171e;
+    border: none;
+    color: #fff;
+}
+
+input:focus{
+    outline: #1a85c7;
 }
 
 ul {
@@ -22,7 +29,8 @@ ul {
 }
 
 li {
-    font-size: 1.1em;
+    font-size: 1em;
+    color: #8899a6;
 }
 
 li:before {
