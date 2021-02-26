@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
   let mutedUserlist = null;
-  let attachInterval = null;
 
   const getMutedUserList = (cb) => chrome.storage.sync.get('mutedUserlist', cb);
 
   const getAppContainer = () => document.getElementById('container');
+
+  const getEntriesContainer = (appColumn) => appColumn.getElementsByClassName('js-chirp-container chirp-container')[0];
 
   const getAppColumns = (appContainer) => {
     if (appContainer === null) return false; // app not ready
@@ -23,11 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return filteredActivityColumns[0]; // there should only be one
   };
 
+  const getColumnContent = (appColumn) => appColumn.getElementsByClassName('js-column-content')[0];
+
   const getColumnEntries = (appColumn) => {
     if (appColumn === false) return false;
 
-    const entriesContainer = appColumn.getElementsByClassName('js-chirp-container chirp-container')[0];
-    const entries = entriesContainer.children;
+    const entries = getEntriesContainer(appColumn).children;
     return Array.from(entries);
   };
 
@@ -47,10 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const getHandleUri = (activityEntry) => activityEntry.getElementsByClassName('account-link')[0].getAttribute('href');
     const getHandleFromHandleUri = (handleUri) => handleUri.split('/').pop().toLowerCase();
     if (!Array.isArray(mutedUserlist)) return;
-
     const activityEntries = getColumnEntries(activityColumn);
     activityEntries.forEach((entry) => {
-      if (entry.getAttribute('data-testid') === 'columnLoadingPlaceholder') return;
+      if (entry.nodeName !== 'ARTICLE' || entry.getAttribute('data-testid') === 'columnLoadingPlaceholder') return;
       const handleUri = getHandleUri(entry);
       const handle = getHandleFromHandleUri(handleUri);
       if (mutedUserlist.includes(handle)) entry.remove();
@@ -60,14 +61,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const attachActivityMuter = () => {
     const appContainer = getAppContainer();
     const appColumns = getAppColumns(appContainer);
-    const target = getActivityColumn(appColumns);
+    const activityColumn = getActivityColumn(appColumns);
+    const target = getColumnContent(activityColumn);
     const activityObserver = new MutationObserver(((mutations) => {
-      mutations.forEach(() => filterActivityColumn());
+      const observerAppContainer = getAppContainer();
+      const observerAppColumns = getAppColumns(observerAppContainer);
+      const observerActivityColumn = getActivityColumn(observerAppColumns);
+      mutations.forEach(() => filterActivityColumn(observerActivityColumn));
     }));
-    activityObserver.observe(target, { childList: true });
+    activityObserver.observe(target, { childList: true, subtree: true });
   };
 
-  attachInterval = window.setInterval(() => {
+  const attachInterval = window.setInterval(() => {
     const appContainer = getAppContainer();
     const appColumns = getAppColumns(appContainer);
     const activityColumn = getActivityColumn(appColumns);
