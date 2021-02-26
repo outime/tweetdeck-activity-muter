@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const getPopulatedUserEl = (username) => `<li>${username} (<a href="#" id="${username}" class="delete">unmute</a>)</li>`;
 
+  const sanitizeHtml = (string) => string.replace(/[^\w. ]/gi, (c) => '&#' + c.charCodeAt(0) + ';');
+
   const getMutedUserList = (cb) => chrome.storage.sync.get('mutedUserlist', cb);
 
   const updateMutedUserList = (userList) => chrome.storage.sync.set(userList);
@@ -39,8 +41,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const getWarningTextEl = () => document.getElementById('warning-text');
 
-  const enableRefreshWarning = (deletedUsername) => {
+  const getUsernameInputEl = () => document.getElementById('username-input');
+
+  const showRefreshWarning = (deletedUsername) => {
     getWarningTextEl().innerHTML = `Past activity from <em>${deletedUsername}</em> and other unmuted users won't be seen <strong>until you refresh</strong>!`;
+  };
+
+  const showInvalidUsernameWarning = (username) => {
+    getWarningTextEl().innerHTML = `Username <em>${sanitizeHtml(username)}</em> is invalid or already exists.`;
+  };
+
+  const cleanUsernameInput = () => {
+    getUsernameInputEl().value = '';
+  };
+
+  const cleanWarning = () => {
+    getWarningTextEl().innerHTML = '';
   };
 
   document.body.addEventListener('click', (e) => {
@@ -52,29 +68,31 @@ document.addEventListener('DOMContentLoaded', () => {
         mutedUserlist.splice(userIndex, 1);
         updateMutedUserList({ mutedUserlist });
         cleanAndPopulateUserlist(getUserlistEl());
-        enableRefreshWarning(username);
+        showRefreshWarning(username);
       });
     }
   });
 
-  document.querySelector('#username-input').addEventListener('keypress', (e) => {
-    const code = e.keyCode || e.which;
-    if (code === 13) {
-      e.preventDefault();
-      const username = document.getElementById('username-input').value.toLowerCase();
-      getMutedUserList((result) => {
-        let { mutedUserlist } = result;
-        if (typeof mutedUserlist === 'undefined') mutedUserlist = [];
-        if ((mutedUserlist.indexOf(username) > -1) || (userRegex.test(username) === false)) return;
-        mutedUserlist.push(username);
-        updateMutedUserList({ mutedUserlist });
-        document.getElementById('username-input').value = '';
-        cleanAndPopulateUserlist(getUserlistEl());
-      });
-    }
+  getUsernameInputEl().addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    const username = e.target.value.toLowerCase();
+    getMutedUserList((result) => {
+      let { mutedUserlist } = result;
+      if (typeof mutedUserlist === 'undefined') mutedUserlist = [];
+      if ((mutedUserlist.indexOf(username) > -1) || (userRegex.test(username) === false)) {
+        showInvalidUsernameWarning(username);
+        return;
+      }
+      mutedUserlist.push(username);
+      updateMutedUserList({ mutedUserlist });
+      cleanUsernameInput();
+      cleanWarning();
+      cleanAndPopulateUserlist(getUserlistEl());
+    });
   });
 
   document.body.style.display = 'block';
   cleanAndPopulateUserlist(getUserlistEl());
-  document.getElementById('username-input').focus();
+  getUsernameInputEl().focus();
 });
