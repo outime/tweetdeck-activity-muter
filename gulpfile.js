@@ -3,7 +3,7 @@
 const gulp = require('gulp');
 const clean = require('gulp-clean');
 const cleanhtml = require('gulp-cleanhtml');
-const minifycss = require('gulp-minify-css');
+const cleancss = require('gulp-clean-css');
 const eslint = require('gulp-eslint');
 //const stripdebug = require('gulp-strip-debug');
 //const uglify = require('gulp-uglify');
@@ -44,7 +44,7 @@ gulp.task('scripts', gulp.series('eslint', (cb) => {
 
 // minify styles
 gulp.task('styles', () => gulp.src('src/styles/**/*.css')
-  .pipe(minifycss({ root: 'src/styles', keepSpecialComments: 0 }))
+  .pipe(cleancss({ level: 2 }))
   .pipe(gulp.dest('build/styles')));
 
 // build ditributable and sourcemaps after other tasks completed
