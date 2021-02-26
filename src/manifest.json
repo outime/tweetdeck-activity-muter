@@ -37,5 +37,11 @@
     "tabs",
     "storage",
     "https://tweetdeck.twitter.com/*"
-  ]
+  ],
+
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "{c8adb6e9-2868-437d-8a7f-9b75ff856fdf}"
+    }
+  }
 }
