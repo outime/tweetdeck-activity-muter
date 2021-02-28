@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const getAppContainer = () => document.getElementById('container');
 
+  const getColumnScroller = (appColumn) => appColumn.getElementsByClassName('js-column-scroller')[0];
+
   const getEntriesContainer = (appColumn) => appColumn.getElementsByClassName('js-chirp-container chirp-container')[0];
 
   const getAppColumns = (appContainer) => {
@@ -12,6 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const appColumns = appContainer.getElementsByClassName('js-app-columns app-columns')[0].children;
     return Array.from(appColumns);
+  };
+
+  const scrollElemToBottom = (elem) => {
+    elem.scrollTop = elem.scrollHeight; // eslint-disable-line no-param-reassign
+  };
+
+  const scrollElemToTop = (elem) => {
+    elem.scrollTop = 0; // eslint-disable-line no-param-reassign
   };
 
   const getActivityColumn = (appColumns) => {
@@ -54,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (entry.nodeName !== 'ARTICLE' || entry.getAttribute('data-testid') === 'columnLoadingPlaceholder') return;
       const handleUri = getHandleUri(entry);
       const handle = getHandleFromHandleUri(handleUri);
-      if (mutedUserlist.includes(handle)) entry.remove();
+      if (mutedUserlist.includes(handle)) entry.style.display = 'none'; // eslint-disable-line no-param-reassign
     });
   };
 
@@ -79,9 +89,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const activityEntries = getColumnEntries(activityColumn);
     if (activityEntries !== false && areColumnEntriesLoaded(activityEntries)) {
       getMutedUserList((result) => {
-        refreshMutedUserlist(result.mutedUserlist, filterActivityColumn, activityColumn);
-        attachActivityMuter();
-        clearInterval(attachInterval);
+        const activityColumnScroller = getColumnScroller(activityColumn);
+        scrollElemToBottom(activityColumnScroller); // get extra tweets to avoid empty list
+        window.setTimeout(() => {
+          scrollElemToTop(getColumnScroller(activityColumn));
+          refreshMutedUserlist(result.mutedUserlist, filterActivityColumn, activityColumn);
+          attachActivityMuter();
+          clearInterval(attachInterval);
+        }, 0);
       });
     }
   }, 500);
